@@ -1,0 +1,27 @@
+# Binaries and build output
+backend/bin/
+frontend/dist/
+frontend/node_modules/
+
+# Environment and secrets — never commit credentials
+.env
+.env.*
+!.env.example
+
+# Local data
+postgres-data/
+.embedded-postgres/
+
+# Test and coverage artifacts
+coverage.out
+coverage.html
+*.test
+
+# Editor and OS noise
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# School assignment docs — present locally but not committed
+docs/

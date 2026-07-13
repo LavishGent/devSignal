@@ -1,0 +1,34 @@
+# Local development and full-stack local runs.
+#
+#   docker compose up -d db     # just PostgreSQL (for `go run` + `npm run dev`)
+#   docker compose up --build   # the whole stack at http://localhost:8080
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: devsignal
+      POSTGRES_PASSWORD: devsignal
+      POSTGRES_DB: devsignal
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U devsignal -d devsignal"]
+      interval: 3s
+      timeout: 3s
+      retries: 15
+
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      DATABASE_URL: postgres://devsignal:devsignal@db:5432/devsignal?sslmode=disable
+      APP_ENV: development # development: no Secure cookie flag without TLS
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres-data:
