@@ -1,29 +1,64 @@
-<strong>**DO NOT DISTRIBUTE OR PUBLICLY POST SOLUTIONS TO THESE LABS. MAKE ALL FORKS OF THIS REPOSITORY WITH SOLUTION CODE PRIVATE. PLEASE REFER TO THE STUDENT CODE OF CONDUCT AND ETHICAL EXPECTATIONS FOR COLLEGE OF INFORMATION TECHNOLOGY STUDENTS FOR SPECIFICS. **</strong>
+# DevSignal
 
-# WESTERN GOVERNORS UNIVERSITY 
-## D424 – SOFTWARE ENGINEERING CAPSTONE
-Welcome to Software Engineering Capstone! This is an opportunity for students to develop full stack software engineering documentation and applications. They will execute documentation, unit testing, revision of software applications, and deploy software applications with scripts and containers on a cloud platform.
+DevSignal is a career-management platform for software engineers, built as the WGU
+D424 Software Engineering Capstone project. It centralizes job applications,
+recruiter contacts, interviews, skills, certifications, study sessions, personal
+projects, and career goals into one web application — then turns that data into
+dashboards, reports, and rule-based recommendations.
 
-FOR SPECIFIC TASK INSTRUCTIONS AND REQUIREMENTS FOR THIS ASSESSMENT, PLEASE REFER TO THE COURSE PAGE.
-BASIC INSTRUCTIONS
-For this assessment, you will deploy your developed full stack software product to a web service of your choice.
+**Business problem.** Technical job seekers manage career advancement across
+disconnected tools: applications in spreadsheets, contacts in email, interviews on
+a calendar, study notes elsewhere. DevSignal replaces that fragmentation with a
+single system that shows what has been done, what is overdue, and what to do next.
 
+## Stack
 
-## SUPPLEMENTAL RESOURCES  
-1.	How to clone a project to IntelliJ using Git?
+| Layer      | Technology                                        |
+|------------|---------------------------------------------------|
+| Frontend   | React 19 + TypeScript (Vite)                      |
+| Backend    | Go (net/http, pgx)                                |
+| Database   | PostgreSQL 16                                     |
+| Packaging  | Docker, docker-compose, Fly.io config, GitLab CI  |
 
-> Ensure that you have Git installed on your system and that IntelliJ is installed using [Toolbox](https://www.jetbrains.com/toolbox-app/). Make sure that you are using version 2022.3.2. Once this has been confirmed, click the clone button and use the 'IntelliJ IDEA (HTTPS)' button. This will open IntelliJ with a prompt to clone the proejct. Save it in a safe location for the directory and press clone. IntelliJ will prompt you for your credentials. Enter in your WGU Credentials and the project will be cloned onto your local machine.  
+## Repository layout
 
-2. How to create a branch and start Development?
+```
+backend/    Go API — domain models, validation, auth, repositories, rules, reports
+frontend/   React/TypeScript SPA
+docs/       All project documentation (design, guides, test plan/results, rubric map)
+```
 
-- GitLab method
-> Press the '+' button located near your branch name. In the dropdown list, press the 'New branch' button. This will allow you to create a name for your branch. Once the branch has been named, you can select 'Create Branch' to push the branch to your repository.
+## Quick start
 
-- IntelliJ method
-> In IntelliJ, Go to the 'Git' button on the top toolbar. Select the new branch option and create a name for the branch. Make sure checkout branch is selected and press create. You can now add a commit message and push the new branch to the local repo.
+See [docs/MAINTENANCE_GUIDE.md](docs/MAINTENANCE_GUIDE.md) for full setup. Short version:
 
-## SUPPORT
-If you need additional support, please navigate to the course page and reach out to your course instructor.
+```bash
+docker compose up -d db        # PostgreSQL 16 on localhost:5432
+cd backend && go run ./cmd/api # API on localhost:8080 (runs migrations at startup)
+cd frontend && npm install && npm run dev   # UI on localhost:5173
+```
 
-## FUTURE USE
-Take this opportunity to create or add to a simple resume portfolio to highlight and showcase your work for future use in career search, experience, and education!
+## Repository and version
+
+This build lives in a local git repository with full commit history
+(`git log`, exported to [docs/evidence/git-history.txt](docs/evidence/git-history.txt)).
+For the WGU submission, push to the course GitLab and record the URL and
+submitted commit here:
+
+- **Repository URL:** `https://gitlab.com/wgu-gitlab-environment/student-repos/<subgroup>/devsignal` *(fill in after push)*
+- **Submitted version:** the commit tagged `submission-1` (`git tag submission-1 && git push --tags`)
+
+## Documentation index
+
+| Document | Purpose |
+|----------|---------|
+| [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) | Functional & nonfunctional requirements |
+| [docs/PROJECT_PLAN.md](docs/PROJECT_PLAN.md) | Implementation plan and task breakdown |
+| [docs/DESIGN.md](docs/DESIGN.md) | Architecture, class diagram, design diagrams, ERD |
+| [docs/USER_GUIDE.md](docs/USER_GUIDE.md) | End-user guide |
+| [docs/MAINTENANCE_GUIDE.md](docs/MAINTENANCE_GUIDE.md) | Setup & operations guide for maintainers |
+| [docs/TEST_PLAN.md](docs/TEST_PLAN.md) | Unit test plan |
+| [docs/TEST_RESULTS.md](docs/TEST_RESULTS.md) | Test results and change summaries |
+| [docs/SECURITY.md](docs/SECURITY.md) | Security features and rationale |
+| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Docker / Fly.io deployment guide |
+| [docs/RUBRIC_MAPPING.md](docs/RUBRIC_MAPPING.md) | Where each rubric requirement is satisfied |
