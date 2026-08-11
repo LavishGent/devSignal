@@ -4,10 +4,11 @@ import { APPLICATION_STATUSES } from '../api/types'
 import { useAuth } from '../auth/AuthContext'
 import ColumnChart from '../components/charts/ColumnChart'
 import PageHeader from '../components/PageHeader'
+import StatTile from '../components/StatTile'
+import { formatMinutes } from '../lib/format'
+import { priorityTone } from '../lib/format'
 import { formatDateTime, humanize } from '../lib/format'
 
-// Dashboard is the landing page: KPI tiles, study activity, pipeline
-// breakdown, upcoming interviews, skill gaps, and top recommendations.
 export default function Dashboard() {
   const { user } = useAuth()
   const { data: summary, isLoading } = useDashboard()
@@ -171,32 +172,3 @@ export default function Dashboard() {
   )
 }
 
-function formatMinutes(min: number): string {
-  if (min < 60) return `${min} min`
-  const hours = min / 60
-  return `${hours % 1 === 0 ? hours : hours.toFixed(1)} h`
-}
-
-function priorityTone(priority: number): string {
-  if (priority === 1) return 'badge-danger'
-  if (priority === 2) return 'badge-warn'
-  return ''
-}
-
-interface StatTileProps {
-  label: string
-  value: number | string
-  sub: string
-  alert?: boolean
-}
-
-// StatTile is the KPI card: label, value, one-line context.
-function StatTile({ label, value, sub, alert }: StatTileProps) {
-  return (
-    <div className="card stat-tile">
-      <div className="stat-label">{label}</div>
-      <div className="stat-value">{value}</div>
-      <div className={'stat-sub' + (alert ? ' alert' : '')}>{sub}</div>
-    </div>
-  )
-}

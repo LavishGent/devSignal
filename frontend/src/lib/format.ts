@@ -51,3 +51,15 @@ export function fromDatetimeLocal(value: string): string {
   if (!value) return ''
   return new Date(value).toISOString()
 }
+
+export function formatMinutes(min: number): string {
+  if (min < 60) return `${min} min`
+  const hours = min / 60
+  return `${hours % 1 === 0 ? hours : hours.toFixed(1)} h`
+}
+
+export function priorityTone(priority: number): string {
+  if (priority === 1) return 'badge-danger'
+  if (priority === 2) return 'badge-warn'
+  return ''
+}
