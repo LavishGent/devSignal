@@ -40,25 +40,18 @@ cd frontend && npm install && npm run dev   # UI on localhost:5173
 
 ## Repository and version
 
-This build lives in a local git repository with full commit history
-(`git log`, exported to [docs/evidence/git-history.txt](docs/evidence/git-history.txt)).
-For the WGU submission, push to the course GitLab and record the URL and
-submitted commit here:
+This build lives in a git repository with full commit history (`git log`). For
+the WGU submission it is pushed to the course GitLab:
 
-- **Repository URL:** `https://gitlab.com/wgu-gitlab-environment/student-repos/<subgroup>/devsignal` *(fill in after push)*
-- **Submitted version:** the commit tagged `submission-1` (`git tag submission-1 && git push --tags`)
+- **Repository URL:** `https://gitlab.com/wgu-gitlab-environment/student-repos/<subgroup>/devsignal`
+- **Submitted version:** the commit tagged `submission-1`
 
 ## Documentation index
 
-| Document | Purpose |
-|----------|---------|
-| [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) | Functional & nonfunctional requirements |
-| [docs/PROJECT_PLAN.md](docs/PROJECT_PLAN.md) | Implementation plan and task breakdown |
-| [docs/DESIGN.md](docs/DESIGN.md) | Architecture, class diagram, design diagrams, ERD |
-| [docs/USER_GUIDE.md](docs/USER_GUIDE.md) | End-user guide |
-| [docs/MAINTENANCE_GUIDE.md](docs/MAINTENANCE_GUIDE.md) | Setup & operations guide for maintainers |
-| [docs/TEST_PLAN.md](docs/TEST_PLAN.md) | Unit test plan |
-| [docs/TEST_RESULTS.md](docs/TEST_RESULTS.md) | Test results and change summaries |
-| [docs/SECURITY.md](docs/SECURITY.md) | Security features and rationale |
-| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Docker / Fly.io deployment guide |
-| [docs/RUBRIC_MAPPING.md](docs/RUBRIC_MAPPING.md) | Where each rubric requirement is satisfied |
+| Document | Purpose | Rubric |
+|----------|---------|--------|
+| [docs/UML.md](docs/UML.md) | UML class diagram (domain model, OOP pillars) | C — UML diagram |
+| [docs/USER_GUIDE.md](docs/USER_GUIDE.md) | Running the application from a user's perspective | C — user guide |
+| [docs/MAINTENANCE_GUIDE.md](docs/MAINTENANCE_GUIDE.md) | Technical guide for building, running, and updating the code | C — technical documentation |
+| [docs/TEST_PLAN.md](docs/TEST_PLAN.md) | Unit test plan and test cases | D — test plan |
+| [docs/TEST_RESULTS.md](docs/TEST_RESULTS.md) | Test results and summary of changes from testing | D — test results |
