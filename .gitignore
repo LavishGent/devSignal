@@ -23,5 +23,9 @@ coverage.html
 .vscode/
 *.swp
 
-# School assignment docs — present locally but not committed
-docs/
+docs/*
+!docs/UML.md
+!docs/USER_GUIDE.md
+!docs/MAINTENANCE_GUIDE.md
+!docs/TEST_PLAN.md
+!docs/TEST_RESULTS.md
