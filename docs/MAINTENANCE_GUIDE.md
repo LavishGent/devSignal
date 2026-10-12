@@ -50,7 +50,25 @@ make api          # run the Go API on :8080 (runs DB migrations at startup)
 make web          # run the Vite dev server on :5173 (proxies /api to :8080)
 ```
 
-Then open `http://localhost:5173`. Configuration comes from environment
+Then open `http://localhost:5173`.
+
+### Demo data
+
+To populate a ready-to-demo account (useful for screencasts and manual
+walkthroughs):
+
+```bash
+make seed         # creates demo@devsignal.app / demopass123
+```
+
+The seeder (`backend/cmd/seed`) reuses the production repositories and domain
+validation, so every seeded record is valid. It is **idempotent**: each run
+deletes the existing demo user (cascading to all their records) and recreates
+the full data set with dates relative to today, so the dashboard, reports, and
+recommendations always look current. Override the credentials with
+`go run ./cmd/seed -email you@example.com -password secret12`.
+
+Configuration comes from environment
 variables with working development defaults; copy `.env.example` to `.env` to
 override. Key variables:
 

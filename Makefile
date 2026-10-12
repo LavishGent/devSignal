@@ -1,6 +1,6 @@
 # Developer entry points. See docs/MAINTENANCE_GUIDE.md for details.
 
-.PHONY: db-up db-down api web test lint integration build docker
+.PHONY: db-up db-down api web seed test lint integration build docker
 
 db-up: ## start PostgreSQL only
 	docker compose up -d db
@@ -13,6 +13,9 @@ api: ## run the Go API (migrates on startup)
 
 web: ## run the frontend dev server on :5173
 	cd frontend && npm run dev
+
+seed: ## load demo data (demo@devsignal.app / demopass123)
+	cd backend && go run ./cmd/seed
 
 test: ## unit + handler tests, both halves
 	cd backend && go vet ./... && go test -count=1 -cover ./...
