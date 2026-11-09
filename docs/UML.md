@@ -243,8 +243,77 @@ classDiagram
     Engine o-- "many" Rule : runs
 ```
 
+## Fixed-choice options (lookup model)
+
+Statuses, categories, stages, outcomes, relationships, and work modes are not
+hard-coded. Each entity declares its enumerated fields through the
+`Enumerated` interface; the handler validates them against the `LookupRepo`,
+whose production implementation reads the `lookup_values` table. Adding an
+option is a database insert, and the UI reads the same lists from
+`GET /api/v1/options`.
+
+```mermaid
+classDiagram
+    direction LR
+
+    class Enumerated {
+        <<interface>>
+        +EnumFields() EnumField[]
+    }
+
+    class EnumField {
+        +string Field
+        +string Kind
+        +string Value
+    }
+
+    class LookupRepo {
+        <<interface>>
+        +All(ctx) Lookups
+    }
+
+    class Lookups {
+        +Values(kind) string[]
+    }
+
+    class Option {
+        +string Value
+        +string Label
+    }
+
+    class BaseHandler {
+        +LookupRepo Lookups
+        +validate(w, r, Validator) bool
+    }
+
+    class PostgresLookups {
+        -pool
+        +All(ctx) Lookups
+    }
+
+    class MemoryLookups {
+        -Lookups lookups
+        +All(ctx) Lookups
+    }
+
+    Enumerated <|.. Application
+    Enumerated <|.. Contact
+    Enumerated <|.. Interview
+    Enumerated <|.. Skill
+    Enumerated <|.. Certification
+    Enumerated <|.. Project
+    Enumerated <|.. Goal
+    Enumerated ..> EnumField : returns
+    LookupRepo <|.. PostgresLookups
+    LookupRepo <|.. MemoryLookups
+    LookupRepo ..> Lookups : returns
+    Lookups o-- "many" Option
+    BaseHandler --> LookupRepo : validates against
+```
+
 ## Source of truth
 
-The diagram is generated from the code in `backend/internal/domain/`,
-`backend/internal/repo/`, and `backend/internal/recommend/`. When an entity or
+The diagrams are generated from the code in `backend/internal/domain/`,
+`backend/internal/repo/`, `backend/internal/httpapi/`, and
+`backend/internal/recommend/`. When an entity or
 rule changes, update this file to match.

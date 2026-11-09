@@ -21,7 +21,7 @@ so the whole product ships as one small container.
 ### Backend package layout (`backend/internal/`)
 | Package | Responsibility |
 |---------|----------------|
-| `domain` | Entities and their validation rules (OOP core) |
+| `domain` | Entities, their validation rules, and the lookup (fixed-choice) model (OOP core) |
 | `validation` | Reusable field-level validators |
 | `repo` | Persistence **interfaces**; `postgres/` and `memory/` implementations |
 | `auth` | Password hashing (bcrypt) and session management |
@@ -36,7 +36,7 @@ so the whole product ships as one small container.
 
 ## 2. Prerequisites
 
-- Go 1.25+
+- Go 1.25.6 or later
 - Node.js 20+ (Docker image uses Node 24)
 - Docker + Docker Compose (for PostgreSQL and container builds)
 
@@ -87,7 +87,7 @@ set them via the environment or `fly secrets set` in production.
 ## 4. Database migrations
 
 SQL migrations live in `backend/migrations/` (`00001_users.sql` …
-`00010_goals.sql`) and are embedded into the binary (`embed.go`). They run
+`00011_lookup_values.sql`) and are embedded into the binary (`embed.go`). They run
 automatically at API startup, in order. **To change the schema, add a new
 numbered migration file** — never edit an already-applied migration. Keep the
 filename prefix sequential.
@@ -118,6 +118,22 @@ filename prefix sequential.
    should appear in reports/search.
 6. Add a page under `frontend/src/pages/` and a route in `frontend/src/App.tsx`.
 7. Add tests and run `make test`.
+
+### Add a fixed-choice option (status, category, stage, …)
+No code change is needed. Insert a row into `lookup_values`:
+
+```sql
+INSERT INTO lookup_values (kind, value, label, sort_order)
+VALUES ('application_status', 'ghosted', 'Ghosted', 9);
+```
+
+The API validates against this table on every request and the UI populates
+its dropdowns from `GET /api/v1/options`, so the new option is live
+immediately. The valid `kind` values are the constants in
+`backend/internal/domain/lookup.go`. To add a *new kind* (a new fixed-choice
+field), add the constant there, add it to `LookupKinds` and
+`DefaultLookups()`, seed it in a new migration, and return it from the
+entity's `EnumFields()`.
 
 ### Add a recommendation rule
 Create a struct embedding `BaseRule`, implement `Evaluate()`, and append it to

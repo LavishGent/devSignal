@@ -34,7 +34,7 @@ production.
 
 | Item | Value |
 |------|-------|
-| Language/tooling | Go 1.25, `go test` |
+| Language/tooling | Go 1.25.6 or later, `go test` |
 | Command (unit) | `go test -count=1 -cover ./...` (or `make test`) |
 | Command (integration) | `make integration` (needs `make db-up`) |
 | Database (unit) | none — in-memory repositories |
@@ -42,14 +42,14 @@ production.
 
 ## 3. Test inventory
 
-The suite contains **107 test functions** across the following packages.
+The suite contains **114 test functions** across the following packages.
 
 | Package | Focus | Example cases |
 |---------|-------|---------------|
 | `validation` | Field validators | required, max length, one-of, int range, email, URL, date order |
-| `domain` | Entity `Validate()` rules and the `Date` value type | per-entity valid/invalid cases |
+| `domain` | Entity `Validate()` rules, the `Date` value type, and the lookup (fixed-choice) model | per-entity valid/invalid cases; `EnumFields` declared on every enumerated entity; `ValidateEnums` fails closed |
 | `auth` | Password hashing and session lifecycle | hash+match, password policy, token uniqueness/hashing, expiry/garbage rejection |
-| `httpapi` | REST handlers for all eight modules + auth/insights | CRUD, validation rejection, search/filter, ownership isolation, auth-required, malformed JSON |
+| `httpapi` | REST handlers for all eight modules + auth/insights/options | CRUD, validation rejection, search/filter, ownership isolation, auth-required, malformed JSON; `/options` serves every lookup kind and enum validation follows the lookup table |
 | `recommend` | Rule engine | each of the eight rules, plus deterministic ordering |
 | `reports` | Report builders and CSV | columns/rows per report, CSV formula-injection escaping |
 | `dashboard` | Summary computation | counts, aggregates, skill-gap ranking |
@@ -118,7 +118,16 @@ attribute (validation, security, search, CRUD, reports).
 - **Expected:** each rule fires on the right condition; output is ordered by
   priority, then module, then title.
 
-### TC-9 — Full stack against real PostgreSQL
+### TC-9 — Fixed-choice options come from the database
+- **Package/test:** `httpapi.TestOptionsEndpointServesEveryKind`,
+  `httpapi.TestEnumValidationFollowsLookupTable`, `domain.TestValidateEnums`.
+- **Steps:** fetch `/api/v1/options`; post a record with an unknown status;
+  add that status to the lookup repository; post again.
+- **Expected:** every lookup kind is served with value/label pairs; the first
+  post is rejected with a `status` field error; after the option is added the
+  same post is accepted with no code change.
+
+### TC-10 — Full stack against real PostgreSQL
 - **Package/test:** `integration.TestFullStackAgainstRealPostgres`.
 - **Steps:** start the real server on a real database, register, log in, run
   CRUD, and read back a report.

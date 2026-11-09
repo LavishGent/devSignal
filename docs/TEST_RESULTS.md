@@ -1,7 +1,7 @@
 # DevSignal — Unit Test Results
 
 Results of executing the plan in [TEST_PLAN.md](TEST_PLAN.md). Commands were run
-from the `backend/` directory with Go 1.25 on the in-memory repositories (no
+from the `backend/` directory with Go 1.26 on the in-memory repositories (no
 database required for the unit suite).
 
 > **Screenshots.** Insert a screenshot of the terminal showing the passing
@@ -88,9 +88,10 @@ round trip. It passes, confirming the production persistence path.
 | TC-6 Search returns grouped matches | Pass |
 | TC-7 Reports build + CSV injection-safe | Pass |
 | TC-8 Recommendations produced and ordered | Pass |
-| TC-9 Full stack vs. real PostgreSQL | Pass |
+| TC-9 Fixed-choice options come from the database | Pass |
+| TC-10 Full stack vs. real PostgreSQL | Pass |
 
-**Totals:** 107 test functions across 8 packages, all passing; `go vet` clean.
+**Totals:** 114 test functions across 8 packages, all passing; `go vet` clean.
 
 ## 6. Summary of changes resulting from testing
 
@@ -124,6 +125,23 @@ Testing was done test-first and drove several concrete changes to the code:
    The engine was changed to sort by priority, then module, then title, making
    results stable and testable.
 
-6. **Date range checks.** Domain tests for certifications and projects revealed
+6. **Fixed-choice options moved to the database.** Status, category, stage,
+   outcome, relationship, and work-mode lists were hard-coded in both the Go
+   domain package and the TypeScript types, so adding an option meant a code
+   change in two places. They now live in the `lookup_values` table
+   (migration `00011`), the API validates against that table on every request
+   (`BaseHandler.validate` + `domain.ValidateEnums`), `GET /api/v1/options`
+   serves the lists, and every dropdown reads from that endpoint.
+   `TestEnumValidationFollowsLookupTable` proves an option added to the store
+   is accepted with no code change.
+
+7. **Integration test helper fixes.** Running the integration suite against
+   the default `postgres://devsignal:devsignal@localhost/devsignal` URL
+   failed: the scratch-database helper replaced the *first* `/devsignal` in
+   the URL (the username) instead of the last (the database). A second
+   assertion searched for text that the test itself had just overwritten.
+   Both were corrected in the test file; application code was unchanged.
+
+8. **Date range checks.** Domain tests for certifications and projects revealed
    that an expiry/last-activity date could precede the earned/started date. A
    `DateOrder` validator was added and wired into the affected entities.
