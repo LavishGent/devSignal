@@ -73,7 +73,12 @@ func startPostgres(t *testing.T) *pgxpool.Pool {
 	if err != nil {
 		t.Fatalf("parsing TEST_DATABASE_URL: %v", err)
 	}
-	scratchURL := strings.Replace(adminURL, "/"+cfg.Database, "/"+dbName, 1)
+	// Replace the last occurrence: the username and password can also be
+	// "devsignal", and the database name is the final path segment.
+	scratchURL := adminURL
+	if i := strings.LastIndex(adminURL, "/"+cfg.Database); i >= 0 {
+		scratchURL = adminURL[:i] + "/" + dbName + adminURL[i+len("/"+cfg.Database):]
+	}
 
 	pool, err := database.Connect(ctx, scratchURL)
 	if err != nil {
@@ -226,8 +231,9 @@ func TestFullStackAgainstRealPostgres(t *testing.T) {
 		t.Errorf("expected multi-module search hits, got %d groups", len(groups))
 	}
 
-	// List filtering with SQL predicates.
-	list := alice.do("GET", "/api/v1/applications?status=interviewing&q=postgres", "", http.StatusOK)
+	// List filtering with SQL predicates. The update above replaced the
+	// notes, so match on the position, which the update preserved.
+	list := alice.do("GET", "/api/v1/applications?status=interviewing&q=backend", "", http.StatusOK)
 	if items := list["items"].([]any); len(items) != 1 {
 		t.Errorf("filtered list = %d rows, want 1", len(items))
 	}
