@@ -7,17 +7,17 @@ import {
   useUpdateMutation,
 } from '../api/hooks'
 import {
-  CERTIFICATION_STATUSES,
   type Certification,
   type RecordInput,
 } from '../api/types'
+import { useOptions } from '../api/options'
 import ConfirmDialog from '../components/ConfirmDialog'
 import DataTable, { type Column } from '../components/DataTable'
 import FormField from '../components/FormField'
 import Modal from '../components/Modal'
 import PageHeader from '../components/PageHeader'
 import StatusBadge from '../components/StatusBadge'
-import { formatDate, humanize } from '../lib/format'
+import { formatDate } from '../lib/format'
 import { useDebounce } from '../lib/useDebounce'
 
 const MODULE = 'certifications'
@@ -45,6 +45,7 @@ const COLUMNS: Column<Certification>[] = [
 // Certifications tracks credentials planned and earned: searchable list,
 // add/edit modal with mirrored server validation, and confirmed deletes.
 export default function Certifications() {
+  const certificationStatuses = useOptions('certification_status')
   const [q, setQ] = useState('')
   const [status, setStatus] = useState('')
   const debouncedQ = useDebounce(q)
@@ -85,11 +86,11 @@ export default function Certifications() {
           aria-label="Filter by status"
         >
           <option value="">All statuses</option>
-          {CERTIFICATION_STATUSES.map((s) => (
-            <option key={s} value={s}>
-              {humanize(s)}
-            </option>
-          ))}
+          {certificationStatuses.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
         </select>
       </div>
 
@@ -133,6 +134,7 @@ interface FormProps {
 }
 
 function CertificationForm({ record, onClose }: FormProps) {
+  const certificationStatuses = useOptions('certification_status')
   const create = useCreateMutation<Certification>(MODULE)
   const update = useUpdateMutation<Certification>(MODULE)
 
@@ -210,9 +212,9 @@ function CertificationForm({ record, onClose }: FormProps) {
           </FormField>
           <FormField label="Status *" error={errors.status}>
             <select className="select" value={status} onChange={(e) => setStatus(e.target.value)}>
-              {CERTIFICATION_STATUSES.map((s) => (
-                <option key={s} value={s}>
-                  {humanize(s)}
+              {certificationStatuses.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
                 </option>
               ))}
             </select>

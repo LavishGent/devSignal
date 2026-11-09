@@ -6,7 +6,8 @@ import {
   useListQuery,
   useUpdateMutation,
 } from '../api/hooks'
-import { SKILL_CATEGORIES, type RecordInput, type Skill } from '../api/types'
+import { type RecordInput, type Skill } from '../api/types'
+import { useOptions } from '../api/options'
 import ConfirmDialog from '../components/ConfirmDialog'
 import DataTable, { type Column } from '../components/DataTable'
 import FormField from '../components/FormField'
@@ -48,6 +49,7 @@ const COLUMNS: Column<Skill>[] = [
 // Skills is the proficiency tracker: searchable list, add/edit modal with
 // mirrored server validation, and confirmed deletes.
 export default function Skills() {
+  const skillCategories = useOptions('skill_category')
   const [q, setQ] = useState('')
   const [category, setCategory] = useState('')
   const debouncedQ = useDebounce(q)
@@ -88,11 +90,11 @@ export default function Skills() {
           aria-label="Filter by category"
         >
           <option value="">All categories</option>
-          {SKILL_CATEGORIES.map((c) => (
-            <option key={c} value={c}>
-              {humanize(c)}
-            </option>
-          ))}
+          {skillCategories.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
         </select>
       </div>
 
@@ -133,6 +135,7 @@ interface FormProps {
 }
 
 function SkillForm({ record, onClose }: FormProps) {
+  const skillCategories = useOptions('skill_category')
   const create = useCreateMutation<Skill>(MODULE)
   const update = useUpdateMutation<Skill>(MODULE)
 
@@ -203,9 +206,9 @@ function SkillForm({ record, onClose }: FormProps) {
           </FormField>
           <FormField label="Category *" error={errors.category}>
             <select className="select" value={category} onChange={(e) => setCategory(e.target.value)}>
-              {SKILL_CATEGORIES.map((c) => (
-                <option key={c} value={c}>
-                  {humanize(c)}
+              {skillCategories.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
                 </option>
               ))}
             </select>

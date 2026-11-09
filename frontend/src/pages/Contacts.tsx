@@ -7,10 +7,10 @@ import {
   useUpdateMutation,
 } from '../api/hooks'
 import {
-  CONTACT_RELATIONSHIPS,
   type Contact,
   type RecordInput,
 } from '../api/types'
+import { useOptions } from '../api/options'
 import ConfirmDialog from '../components/ConfirmDialog'
 import DataTable, { type Column } from '../components/DataTable'
 import FormField from '../components/FormField'
@@ -41,6 +41,7 @@ const COLUMNS: Column<Contact>[] = [
 // Contacts is the networking rolodex: searchable list, add/edit modal with
 // mirrored server validation, and confirmed deletes.
 export default function Contacts() {
+  const contactRelationships = useOptions('contact_relationship')
   const [q, setQ] = useState('')
   const [relationship, setRelationship] = useState('')
   const debouncedQ = useDebounce(q)
@@ -81,11 +82,11 @@ export default function Contacts() {
           aria-label="Filter by relationship"
         >
           <option value="">All relationships</option>
-          {CONTACT_RELATIONSHIPS.map((r) => (
-            <option key={r} value={r}>
-              {humanize(r)}
-            </option>
-          ))}
+          {contactRelationships.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
         </select>
       </div>
 
@@ -129,6 +130,7 @@ interface FormProps {
 }
 
 function ContactForm({ record, onClose }: FormProps) {
+  const contactRelationships = useOptions('contact_relationship')
   const create = useCreateMutation<Contact>(MODULE)
   const update = useUpdateMutation<Contact>(MODULE)
 
@@ -204,9 +206,9 @@ function ContactForm({ record, onClose }: FormProps) {
           </FormField>
           <FormField label="Relationship *" error={errors.relationship}>
             <select className="select" value={relationship} onChange={(e) => setRelationship(e.target.value)}>
-              {CONTACT_RELATIONSHIPS.map((r) => (
-                <option key={r} value={r}>
-                  {humanize(r)}
+              {contactRelationships.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
                 </option>
               ))}
             </select>

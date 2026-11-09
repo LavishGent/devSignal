@@ -7,11 +7,10 @@ import {
   useUpdateMutation,
 } from '../api/hooks'
 import {
-  APPLICATION_STATUSES,
-  WORK_MODES,
   type Application,
   type RecordInput,
 } from '../api/types'
+import { useOptions } from '../api/options'
 import ConfirmDialog from '../components/ConfirmDialog'
 import DataTable, { type Column } from '../components/DataTable'
 import FormField from '../components/FormField'
@@ -42,6 +41,7 @@ const COLUMNS: Column<Application>[] = [
 // Applications is the job-application pipeline: searchable list, add/edit
 // modal with mirrored server validation, and confirmed deletes.
 export default function Applications() {
+  const applicationStatuses = useOptions('application_status')
   const [q, setQ] = useState('')
   const [status, setStatus] = useState('')
   const debouncedQ = useDebounce(q)
@@ -82,11 +82,11 @@ export default function Applications() {
           aria-label="Filter by status"
         >
           <option value="">All statuses</option>
-          {APPLICATION_STATUSES.map((s) => (
-            <option key={s} value={s}>
-              {humanize(s)}
-            </option>
-          ))}
+          {applicationStatuses.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
         </select>
       </div>
 
@@ -130,6 +130,8 @@ interface FormProps {
 }
 
 function ApplicationForm({ record, onClose }: FormProps) {
+  const applicationStatuses = useOptions('application_status')
+  const workModes = useOptions('work_mode')
   const create = useCreateMutation<Application>(MODULE)
   const update = useUpdateMutation<Application>(MODULE)
 
@@ -212,9 +214,9 @@ function ApplicationForm({ record, onClose }: FormProps) {
           </FormField>
           <FormField label="Status *" error={errors.status}>
             <select className="select" value={status} onChange={(e) => setStatus(e.target.value)}>
-              {APPLICATION_STATUSES.map((s) => (
-                <option key={s} value={s}>
-                  {humanize(s)}
+              {applicationStatuses.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
                 </option>
               ))}
             </select>
@@ -228,9 +230,9 @@ function ApplicationForm({ record, onClose }: FormProps) {
           <FormField label="Work mode" error={errors.workMode}>
             <select className="select" value={workMode} onChange={(e) => setWorkMode(e.target.value)}>
               <option value="">Not specified</option>
-              {WORK_MODES.map((m) => (
-                <option key={m} value={m}>
-                  {humanize(m)}
+              {workModes.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
                 </option>
               ))}
             </select>

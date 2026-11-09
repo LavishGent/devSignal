@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useDashboard, useRecommendations } from '../api/insights'
-import { APPLICATION_STATUSES } from '../api/types'
+import { useOptions } from '../api/options'
 import { useAuth } from '../auth/AuthContext'
 import ColumnChart from '../components/charts/ColumnChart'
 import PageHeader from '../components/PageHeader'
@@ -10,6 +10,7 @@ import { priorityTone } from '../lib/format'
 import { formatDateTime, humanize } from '../lib/format'
 
 export default function Dashboard() {
+  const applicationStatuses = useOptions('application_status')
   const { user } = useAuth()
   const { data: summary, isLoading } = useDashboard()
   const { data: recommendations = [] } = useRecommendations(6)
@@ -99,12 +100,12 @@ export default function Dashboard() {
             </div>
           ) : (
             <div className="hbar-list">
-              {APPLICATION_STATUSES.map((status) => {
+              {applicationStatuses.map(({ value: status, label }) => {
                 const count = summary.applicationsByStatus[status] ?? 0
                 if (count === 0) return null
                 return (
                   <div className="hbar-row" key={status}>
-                    <span className="hbar-label">{humanize(status)}</span>
+                    <span className="hbar-label">{label}</span>
                     <div className="hbar-track">
                       <div className="hbar-fill" style={{ width: `${(count / pipelineMax) * 100}%` }} />
                     </div>

@@ -7,11 +7,10 @@ import {
   useUpdateMutation,
 } from '../api/hooks'
 import {
-  GOAL_CATEGORIES,
-  GOAL_STATUSES,
   type Goal,
   type RecordInput,
 } from '../api/types'
+import { useOptions } from '../api/options'
 import ConfirmDialog from '../components/ConfirmDialog'
 import DataTable, { type Column } from '../components/DataTable'
 import FormField from '../components/FormField'
@@ -64,6 +63,8 @@ const COLUMNS: Column<Goal>[] = [
 // Goals is the objective tracker: searchable list, add/edit modal with
 // mirrored server validation, and confirmed deletes.
 export default function Goals() {
+  const goalStatuses = useOptions('goal_status')
+  const goalCategories = useOptions('goal_category')
   const [q, setQ] = useState('')
   const [status, setStatus] = useState('')
   const [category, setCategory] = useState('')
@@ -106,11 +107,11 @@ export default function Goals() {
           aria-label="Filter by status"
         >
           <option value="">All statuses</option>
-          {GOAL_STATUSES.map((s) => (
-            <option key={s} value={s}>
-              {humanize(s)}
-            </option>
-          ))}
+          {goalStatuses.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
         </select>
         <select
           className="select"
@@ -119,11 +120,11 @@ export default function Goals() {
           aria-label="Filter by category"
         >
           <option value="">All categories</option>
-          {GOAL_CATEGORIES.map((c) => (
-            <option key={c} value={c}>
-              {humanize(c)}
-            </option>
-          ))}
+          {goalCategories.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
         </select>
       </div>
 
@@ -164,6 +165,8 @@ interface FormProps {
 }
 
 function GoalForm({ record, onClose }: FormProps) {
+  const goalCategories = useOptions('goal_category')
+  const goalStatuses = useOptions('goal_status')
   const create = useCreateMutation<Goal>(MODULE)
   const update = useUpdateMutation<Goal>(MODULE)
 
@@ -235,18 +238,18 @@ function GoalForm({ record, onClose }: FormProps) {
           </FormField>
           <FormField label="Category *" error={errors.category}>
             <select className="select" value={category} onChange={(e) => setCategory(e.target.value)}>
-              {GOAL_CATEGORIES.map((c) => (
-                <option key={c} value={c}>
-                  {humanize(c)}
+              {goalCategories.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
                 </option>
               ))}
             </select>
           </FormField>
           <FormField label="Status *" error={errors.status}>
             <select className="select" value={status} onChange={(e) => setStatus(e.target.value)}>
-              {GOAL_STATUSES.map((s) => (
-                <option key={s} value={s}>
-                  {humanize(s)}
+              {goalStatuses.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
                 </option>
               ))}
             </select>

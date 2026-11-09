@@ -7,12 +7,11 @@ import {
   useUpdateMutation,
 } from '../api/hooks'
 import {
-  INTERVIEW_OUTCOMES,
-  INTERVIEW_STAGES,
   type Application,
   type Interview,
   type RecordInput,
 } from '../api/types'
+import { useOptions } from '../api/options'
 import ConfirmDialog from '../components/ConfirmDialog'
 import DataTable, { type Column } from '../components/DataTable'
 import FormField from '../components/FormField'
@@ -61,6 +60,8 @@ function buildColumns(apps: Map<string, Application>): Column<Interview>[] {
 // Interviews tracks every scheduled round: searchable list, add/edit
 // modal with mirrored server validation, and confirmed deletes.
 export default function Interviews() {
+  const interviewStages = useOptions('interview_stage')
+  const interviewOutcomes = useOptions('interview_outcome')
   const [q, setQ] = useState('')
   const [stage, setStage] = useState('')
   const [outcome, setOutcome] = useState('')
@@ -105,11 +106,11 @@ export default function Interviews() {
           aria-label="Filter by stage"
         >
           <option value="">All stages</option>
-          {INTERVIEW_STAGES.map((s) => (
-            <option key={s} value={s}>
-              {humanize(s)}
-            </option>
-          ))}
+          {interviewStages.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
         </select>
         <select
           className="select"
@@ -118,11 +119,11 @@ export default function Interviews() {
           aria-label="Filter by outcome"
         >
           <option value="">All outcomes</option>
-          {INTERVIEW_OUTCOMES.map((o) => (
-            <option key={o} value={o}>
-              {humanize(o)}
-            </option>
-          ))}
+          {interviewOutcomes.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
         </select>
       </div>
 
@@ -166,6 +167,8 @@ interface FormProps {
 }
 
 function InterviewForm({ record, onClose }: FormProps) {
+  const interviewStages = useOptions('interview_stage')
+  const interviewOutcomes = useOptions('interview_outcome')
   const create = useCreateMutation<Interview>(MODULE)
   const update = useUpdateMutation<Interview>(MODULE)
   const { data: applications = [] } = useListQuery<Application>('applications', {})
@@ -249,9 +252,9 @@ function InterviewForm({ record, onClose }: FormProps) {
           </FormField>
           <FormField label="Stage *" error={errors.stage}>
             <select className="select" value={stage} onChange={(e) => setStage(e.target.value)}>
-              {INTERVIEW_STAGES.map((s) => (
-                <option key={s} value={s}>
-                  {humanize(s)}
+              {interviewStages.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
                 </option>
               ))}
             </select>
@@ -270,9 +273,9 @@ function InterviewForm({ record, onClose }: FormProps) {
           </FormField>
           <FormField label="Outcome *" error={errors.outcome}>
             <select className="select" value={outcome} onChange={(e) => setOutcome(e.target.value)}>
-              {INTERVIEW_OUTCOMES.map((o) => (
-                <option key={o} value={o}>
-                  {humanize(o)}
+              {interviewOutcomes.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
                 </option>
               ))}
             </select>

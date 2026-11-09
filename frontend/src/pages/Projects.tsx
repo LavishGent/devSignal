@@ -6,14 +6,15 @@ import {
   useListQuery,
   useUpdateMutation,
 } from '../api/hooks'
-import { PROJECT_STATUSES, type Project, type RecordInput } from '../api/types'
+import { type Project, type RecordInput } from '../api/types'
+import { useOptions } from '../api/options'
 import ConfirmDialog from '../components/ConfirmDialog'
 import DataTable, { type Column } from '../components/DataTable'
 import FormField from '../components/FormField'
 import Modal from '../components/Modal'
 import PageHeader from '../components/PageHeader'
 import StatusBadge from '../components/StatusBadge'
-import { formatDate, humanize } from '../lib/format'
+import { formatDate } from '../lib/format'
 import { useDebounce } from '../lib/useDebounce'
 
 const MODULE = 'projects'
@@ -50,6 +51,7 @@ const COLUMNS: Column<Project>[] = [
 // Projects is the portfolio tracker: searchable list, add/edit modal with
 // mirrored server validation, and confirmed deletes.
 export default function Projects() {
+  const projectStatuses = useOptions('project_status')
   const [q, setQ] = useState('')
   const [status, setStatus] = useState('')
   const debouncedQ = useDebounce(q)
@@ -90,11 +92,11 @@ export default function Projects() {
           aria-label="Filter by status"
         >
           <option value="">All statuses</option>
-          {PROJECT_STATUSES.map((s) => (
-            <option key={s} value={s}>
-              {humanize(s)}
-            </option>
-          ))}
+          {projectStatuses.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
         </select>
       </div>
 
@@ -138,6 +140,7 @@ interface FormProps {
 }
 
 function ProjectForm({ record, onClose }: FormProps) {
+  const projectStatuses = useOptions('project_status')
   const create = useCreateMutation<Project>(MODULE)
   const update = useUpdateMutation<Project>(MODULE)
 
@@ -212,9 +215,9 @@ function ProjectForm({ record, onClose }: FormProps) {
           </FormField>
           <FormField label="Status *" error={errors.status}>
             <select className="select" value={status} onChange={(e) => setStatus(e.target.value)}>
-              {PROJECT_STATUSES.map((s) => (
-                <option key={s} value={s}>
-                  {humanize(s)}
+              {projectStatuses.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
                 </option>
               ))}
             </select>

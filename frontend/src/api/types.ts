@@ -16,59 +16,18 @@ export interface User {
   updatedAt: string
 }
 
-// ---- enums (kept in sync with backend domain package) ----
-
-export const APPLICATION_STATUSES = [
-  'wishlist', 'applied', 'phone_screen', 'interviewing',
-  'offer', 'accepted', 'rejected', 'withdrawn',
-] as const
-export type ApplicationStatus = (typeof APPLICATION_STATUSES)[number]
-
-export const WORK_MODES = ['remote', 'hybrid', 'onsite'] as const
-export type WorkMode = (typeof WORK_MODES)[number]
-
-export const CONTACT_RELATIONSHIPS = [
-  'recruiter', 'hiring_manager', 'engineer', 'mentor', 'peer', 'other',
-] as const
-export type ContactRelationship = (typeof CONTACT_RELATIONSHIPS)[number]
-
-export const INTERVIEW_STAGES = [
-  'phone_screen', 'technical', 'system_design', 'behavioral', 'onsite', 'final',
-] as const
-export type InterviewStage = (typeof INTERVIEW_STAGES)[number]
-
-export const INTERVIEW_OUTCOMES = ['pending', 'passed', 'failed', 'cancelled'] as const
-export type InterviewOutcome = (typeof INTERVIEW_OUTCOMES)[number]
-
-export const SKILL_CATEGORIES = [
-  'language', 'framework', 'database', 'cloud', 'tooling',
-  'system_design', 'soft_skill', 'other',
-] as const
-export type SkillCategory = (typeof SKILL_CATEGORIES)[number]
-
-export const CERTIFICATION_STATUSES = ['planned', 'in_progress', 'earned', 'expired'] as const
-export type CertificationStatus = (typeof CERTIFICATION_STATUSES)[number]
-
-export const PROJECT_STATUSES = ['idea', 'active', 'paused', 'completed', 'archived'] as const
-export type ProjectStatus = (typeof PROJECT_STATUSES)[number]
-
-export const GOAL_CATEGORIES = [
-  'job_search', 'skill', 'certification', 'project', 'networking', 'other',
-] as const
-export type GoalCategory = (typeof GOAL_CATEGORIES)[number]
-
-export const GOAL_STATUSES = ['not_started', 'in_progress', 'completed', 'abandoned'] as const
-export type GoalStatus = (typeof GOAL_STATUSES)[number]
+// Fixed-choice fields are plain strings; the allowed values come from the
+// server (see options.ts), not from this file.
 
 // ---- records ----
 
 export interface Application extends BaseRecord {
   company: string
   position: string
-  status: ApplicationStatus
+  status: string
   appliedOn: string | null
   location: string
-  workMode: WorkMode | ''
+  workMode: string
   url: string
   salaryMin: number | null
   salaryMax: number | null
@@ -79,7 +38,7 @@ export interface Contact extends BaseRecord {
   name: string
   company: string
   role: string
-  relationship: ContactRelationship
+  relationship: string
   email: string
   phone: string
   linkedinUrl: string
@@ -90,19 +49,19 @@ export interface Contact extends BaseRecord {
 
 export interface Interview extends BaseRecord {
   applicationId: string
-  stage: InterviewStage
+  stage: string
   scheduledAt: string
   durationMinutes: number
   interviewer: string
   location: string
-  outcome: InterviewOutcome
+  outcome: string
   prepNotes: string
   feedback: string
 }
 
 export interface Skill extends BaseRecord {
   name: string
-  category: SkillCategory
+  category: string
   proficiency: number
   targetProficiency: number
   lastPracticedOn: string | null
@@ -121,7 +80,7 @@ export interface StudySession extends BaseRecord {
 export interface Certification extends BaseRecord {
   name: string
   issuer: string
-  status: CertificationStatus
+  status: string
   earnedOn: string | null
   expiresOn: string | null
   credentialId: string
@@ -132,7 +91,7 @@ export interface Certification extends BaseRecord {
 export interface Project extends BaseRecord {
   name: string
   description: string
-  status: ProjectStatus
+  status: string
   techStack: string
   repoUrl: string
   demoUrl: string
@@ -144,8 +103,8 @@ export interface Project extends BaseRecord {
 export interface Goal extends BaseRecord {
   title: string
   description: string
-  category: GoalCategory
-  status: GoalStatus
+  category: string
+  status: string
   priority: number
   targetDate: string | null
   completedOn: string | null
