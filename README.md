@@ -43,8 +43,8 @@ cd frontend && npm install && npm run dev   # UI on localhost:5173
 This build lives in a git repository with full commit history (`git log`). For
 the WGU submission it is pushed to the course GitLab:
 
-- **Repository URL:** `https://gitlab.com/wgu-gitlab-environment/student-repos/<subgroup>/devsignal`
-- **Submitted version:** the commit tagged `submission-1`
+- **Repository URL:** `https://gitlab.com/wgu-gitlab-environment/student-repos/dgre484/d424-software-engineering-capstone`
+- **Submitted branch:** `development` (the `main` branch holds only the WGU template)
 
 ## Documentation index
 
