@@ -1,6 +1,8 @@
 package dashboard
 
 import (
+	"encoding/json"
+	"strings"
 	"testing"
 	"time"
 
@@ -29,7 +31,7 @@ func TestBuildSummary(t *testing.T) {
 		},
 		Interviews: []domain.Interview{
 			{BaseRecord: stamped(user), ApplicationID: app.ID, Stage: "technical", Outcome: "pending", ScheduledAt: now.Add(3 * 24 * time.Hour)},
-			{BaseRecord: stamped(user), ApplicationID: app.ID, Stage: "onsite", Outcome: "pending", ScheduledAt: now.Add(20 * 24 * time.Hour)},  // outside window
+			{BaseRecord: stamped(user), ApplicationID: app.ID, Stage: "onsite", Outcome: "pending", ScheduledAt: now.Add(20 * 24 * time.Hour)}, // outside window
 			{BaseRecord: stamped(user), ApplicationID: app.ID, Stage: "phone_screen", Outcome: "passed", ScheduledAt: now.Add(24 * time.Hour)}, // decided
 		},
 		Skills: []domain.Skill{
@@ -99,5 +101,22 @@ func TestBuildEmptySnapshotIsSafe(t *testing.T) {
 	}
 	if sum.UpcomingInterviews == nil {
 		t.Error("UpcomingInterviews should be an empty slice, not null JSON")
+	}
+}
+
+// Empty summary encodes its lists as arrays, not null.
+func TestEmptySummaryEncodesArraysNotNull(t *testing.T) {
+	raw, err := json.Marshal(Build(&snapshot.Snapshot{}, now))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var decoded map[string]json.RawMessage
+	if err := json.Unmarshal(raw, &decoded); err != nil {
+		t.Fatal(err)
+	}
+	for _, key := range []string{"upcomingInterviews", "studyByDay", "topSkillGaps"} {
+		if !strings.HasPrefix(string(decoded[key]), "[") {
+			t.Errorf("%s should encode as a JSON array, got %s", key, decoded[key])
+		}
 	}
 }

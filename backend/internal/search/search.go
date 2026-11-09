@@ -47,7 +47,7 @@ type Service struct {
 // no hits are omitted.
 func (s *Service) Search(ctx context.Context, userID uuid.UUID, q string) ([]Group, error) {
 	page := repo.Page{Limit: perModuleLimit}
-	var groups []Group
+	groups := []Group{} // [] not null when empty
 
 	add := func(module, label string, items []Item, err error) error {
 		if err != nil {

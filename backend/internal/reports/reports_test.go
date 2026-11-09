@@ -1,6 +1,7 @@
 package reports
 
 import (
+	"encoding/json"
 	"strings"
 	"testing"
 	"time"
@@ -177,4 +178,19 @@ func TestCSVNeutralizesFormulaInjection(t *testing.T) {
 	}
 	// The skill-gap report's own "+2" cells get the same treatment: values
 	// remain readable, just inert in spreadsheets.
+}
+
+// Empty reports encode rows as [], not null.
+func TestEmptyReportsEncodeRowsAsEmptyArray(t *testing.T) {
+	empty := &snapshot.Snapshot{}
+	for _, info := range Catalog() {
+		build, _ := ByID(info.ID)
+		raw, err := json.Marshal(build(empty, now))
+		if err != nil {
+			t.Fatalf("%s: %v", info.ID, err)
+		}
+		if !strings.Contains(string(raw), `"rows":[]`) {
+			t.Errorf("%s: empty report should encode \"rows\":[], got %s", info.ID, raw)
+		}
+	}
 }

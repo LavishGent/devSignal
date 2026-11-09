@@ -242,3 +242,17 @@ func TestInsightsIsolatedPerUser(t *testing.T) {
 		t.Errorf("bob's search sees alice's records: %v", groups)
 	}
 }
+
+// Empty search encodes groups as [] and not null.
+func TestSearchWithNoHitsReturnsEmptyArray(t *testing.T) {
+	ts, c := newInsightsTestServer(t)
+	resp, err := c.Get(ts.URL + "/api/v1/search?q=zzzznothing")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() { _ = resp.Body.Close() }()
+	raw, _ := io.ReadAll(resp.Body)
+	if !strings.Contains(string(raw), `"groups":[]`) {
+		t.Errorf("empty search should encode groups as [], got %s", raw)
+	}
+}

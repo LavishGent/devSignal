@@ -51,7 +51,7 @@ export default function Reports() {
                   </button>
                 </div>
               </div>
-              {report.rows.length === 0 ? (
+              {(report.rows ?? []).length === 0 ? (
                 <div className="empty-state">
                   <strong>No data yet</strong>
                   Add records to populate this report.
@@ -67,7 +67,7 @@ export default function Reports() {
                       </tr>
                     </thead>
                     <tbody>
-                      {report.rows.map((row, i) => (
+                      {(report.rows ?? []).map((row, i) => (
                         <tr key={i}>
                           {row.map((cell, j) => (
                             <td key={j}>{cell}</td>

@@ -6,6 +6,7 @@ package reports
 import (
 	"bytes"
 	"encoding/csv"
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -24,6 +25,16 @@ type Report struct {
 	GeneratedAt time.Time  `json:"generatedAt"`
 	Columns     []Column   `json:"columns"`
 	Rows        [][]string `json:"rows"`
+}
+
+// MarshalJSON encodes nil Rows as [] instead of null.
+func (r *Report) MarshalJSON() ([]byte, error) {
+	type plain Report
+	out := plain(*r)
+	if out.Rows == nil {
+		out.Rows = [][]string{}
+	}
+	return json.Marshal(out)
 }
 
 // CSV renders the report with its title and timestamp as leading comment
