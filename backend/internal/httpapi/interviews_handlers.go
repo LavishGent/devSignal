@@ -79,7 +79,7 @@ func (h *InterviewsHandler) create(w http.ResponseWriter, r *http.Request) {
 		h.badRequest(w, err)
 		return
 	}
-	if !h.validate(w, &i) {
+	if !h.validate(w, r, &i) {
 		return
 	}
 	if !h.checkApplicationLink(w, r, userID, i.ApplicationID) {
@@ -124,7 +124,7 @@ func (h *InterviewsHandler) update(w http.ResponseWriter, r *http.Request) {
 		h.badRequest(w, err)
 		return
 	}
-	if !h.validate(w, &in) {
+	if !h.validate(w, r, &in) {
 		return
 	}
 	if !h.checkApplicationLink(w, r, userID, in.ApplicationID) {

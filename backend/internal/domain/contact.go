@@ -2,11 +2,6 @@ package domain
 
 import "devsignal/internal/validation"
 
-// ContactRelationships describe how a contact relates to the job search.
-var ContactRelationships = []string{
-	"recruiter", "hiring_manager", "engineer", "mentor", "peer", "other",
-}
-
 // Contact is one professional or recruiter contact.
 type Contact struct {
 	BaseRecord
@@ -30,7 +25,6 @@ func (c *Contact) Validate() validation.Errors {
 	validation.MaxLen(e, "company", c.Company, 200)
 	validation.MaxLen(e, "role", c.Role, 200)
 	validation.Required(e, "relationship", c.Relationship)
-	validation.OneOf(e, "relationship", c.Relationship, ContactRelationships...)
 	validation.Email(e, "email", c.Email)
 	validation.MaxLen(e, "email", c.Email, 254)
 	validation.MaxLen(e, "phone", c.Phone, 50)
@@ -38,4 +32,12 @@ func (c *Contact) Validate() validation.Errors {
 	validation.MaxLen(e, "linkedinUrl", c.LinkedinURL, 2000)
 	validation.MaxLen(e, "notes", c.Notes, 5000)
 	return e
+}
+
+// EnumFields implements Enumerated; the allowed values come from the lookup
+// table at request time.
+func (c *Contact) EnumFields() []EnumField {
+	return []EnumField{
+		{Field: "relationship", Kind: KindContactRelationship, Value: c.Relationship},
+	}
 }

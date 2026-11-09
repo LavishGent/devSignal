@@ -22,7 +22,7 @@ func newStudySessionsTestServer(t *testing.T) (*httptest.Server, *http.Client) {
 	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
 	users := memory.NewUserRepo()
 	sessions := auth.NewSessionManager(memory.NewSessionRepo(), time.Hour)
-	base := NewBaseHandler(logger)
+	base := NewBaseHandler(logger, memory.NewLookupRepo())
 	authH := NewAuthHandler(base, users, sessions, 10, false)
 	srv := NewServer(logger, false, "", authH)
 	skills := memory.NewSkillRepo()

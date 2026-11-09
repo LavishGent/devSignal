@@ -34,13 +34,14 @@ func UserIDFrom(ctx context.Context) (uuid.UUID, bool) {
 // handlers embed it (inheritance via struct embedding), so request parsing,
 // error mapping, and clock access are written exactly once.
 type BaseHandler struct {
-	Logger *slog.Logger
-	Now    func() time.Time
+	Logger  *slog.Logger
+	Now     func() time.Time
+	Lookups repo.LookupRepo // fixed-choice option lists, owned by the database
 }
 
 // NewBaseHandler builds the shared handler core.
-func NewBaseHandler(logger *slog.Logger) BaseHandler {
-	return BaseHandler{Logger: logger, Now: time.Now}
+func NewBaseHandler(logger *slog.Logger, lookups repo.LookupRepo) BaseHandler {
+	return BaseHandler{Logger: logger, Now: time.Now, Lookups: lookups}
 }
 
 // userID returns the authenticated user, failing the request if the auth
@@ -91,11 +92,22 @@ func (h BaseHandler) badRequest(w http.ResponseWriter, err error) {
 	respondError(w, http.StatusBadRequest, err.Error())
 }
 
-// validate runs any entity through the Validator interface and writes the
-// field-keyed 400 response on failure. Every module handler validates its
-// records polymorphically through this one contract.
-func (h BaseHandler) validate(w http.ResponseWriter, v domain.Validator) bool {
-	if errs := v.Validate(); !errs.Ok() {
+// validate runs any entity through the Validator interface, then checks its
+// fixed-choice fields against the lookup table, and writes the field-keyed
+// 400 response on failure. Every module handler validates its records
+// polymorphically through this one contract. Structural and enumeration
+// problems are reported together so the user fixes the form in one pass.
+func (h BaseHandler) validate(w http.ResponseWriter, r *http.Request, v domain.Validator) bool {
+	errs := v.Validate()
+	if ent, ok := v.(domain.Enumerated); ok {
+		lookups, err := h.Lookups.All(r.Context())
+		if err != nil {
+			h.repoError(w, err)
+			return false
+		}
+		domain.ValidateEnums(errs, ent, lookups)
+	}
+	if !errs.Ok() {
 		respondValidation(w, errs)
 		return false
 	}

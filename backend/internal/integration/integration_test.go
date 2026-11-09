@@ -104,7 +104,7 @@ func newRealServer(t *testing.T, pool *pgxpool.Pool) *httptest.Server {
 	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
 	store := postgres.NewStore(pool)
 	sessions := auth.NewSessionManager(store.Sessions, time.Hour)
-	base := httpapi.NewBaseHandler(logger)
+	base := httpapi.NewBaseHandler(logger, store.Lookups)
 	authH := httpapi.NewAuthHandler(base, store.Users, sessions, 10, false)
 	srv := httpapi.NewServer(logger, false, "", authH)
 
@@ -116,6 +116,7 @@ func newRealServer(t *testing.T, pool *pgxpool.Pool) *httptest.Server {
 	srv.AddModule(httpapi.NewCertificationsHandler(base, store.Certifications))
 	srv.AddModule(httpapi.NewProjectsHandler(base, store.Projects))
 	srv.AddModule(httpapi.NewGoalsHandler(base, store.Goals))
+	srv.AddModule(httpapi.NewLookupsHandler(base))
 	loader := snapshot.Loader{
 		Applications: store.Applications, Contacts: store.Contacts, Interviews: store.Interviews,
 		Skills: store.Skills, StudySessions: store.StudySessions, Certifications: store.Certifications,
@@ -230,6 +231,15 @@ func TestFullStackAgainstRealPostgres(t *testing.T) {
 	if len(groups) < 3 {
 		t.Errorf("expected multi-module search hits, got %d groups", len(groups))
 	}
+
+	// Fixed-choice lists come from the lookup_values table seeded by the
+	// migration, and the API validates against the same rows.
+	opts := alice.do("GET", "/api/v1/options", "", http.StatusOK)
+	if statuses, _ := opts["application_status"].([]any); len(statuses) != 8 {
+		t.Errorf("options: application_status has %d entries, want 8", len(statuses))
+	}
+	alice.do("POST", "/api/v1/applications",
+		`{"company":"Nope","position":"Dev","status":"not_a_real_status"}`, http.StatusBadRequest)
 
 	// List filtering with SQL predicates. The update above replaced the
 	// notes, so match on the position, which the update preserved.

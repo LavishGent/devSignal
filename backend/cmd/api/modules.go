@@ -21,6 +21,7 @@ func registerModules(server *httpapi.Server, base httpapi.BaseHandler, store *po
 	server.AddModule(httpapi.NewCertificationsHandler(base, store.Certifications))
 	server.AddModule(httpapi.NewProjectsHandler(base, store.Projects))
 	server.AddModule(httpapi.NewGoalsHandler(base, store.Goals))
+	server.AddModule(httpapi.NewLookupsHandler(base))
 
 	loader := snapshot.Loader{
 		Applications:   store.Applications,

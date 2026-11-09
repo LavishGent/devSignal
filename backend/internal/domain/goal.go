@@ -2,14 +2,6 @@ package domain
 
 import "devsignal/internal/validation"
 
-// GoalCategories classify what kind of career progress a goal drives.
-var GoalCategories = []string{
-	"job_search", "skill", "certification", "project", "networking", "other",
-}
-
-// GoalStatuses model a goal's lifecycle.
-var GoalStatuses = []string{"not_started", "in_progress", "completed", "abandoned"}
-
 // Goal is one tracked career goal.
 type Goal struct {
 	BaseRecord
@@ -30,13 +22,20 @@ func (g *Goal) Validate() validation.Errors {
 	validation.MaxLen(e, "title", g.Title, 300)
 	validation.MaxLen(e, "description", g.Description, 5000)
 	validation.Required(e, "category", g.Category)
-	validation.OneOf(e, "category", g.Category, GoalCategories...)
 	validation.Required(e, "status", g.Status)
-	validation.OneOf(e, "status", g.Status, GoalStatuses...)
 	validation.IntRange(e, "priority", g.Priority, 1, 3)
 	if g.Status != "completed" && !g.CompletedOn.IsZero() {
 		e.Add("completedOn", "may only be set when status is completed")
 	}
 	validation.MaxLen(e, "notes", g.Notes, 5000)
 	return e
+}
+
+// EnumFields implements Enumerated; the allowed values come from the lookup
+// table at request time.
+func (g *Goal) EnumFields() []EnumField {
+	return []EnumField{
+		{Field: "category", Kind: KindGoalCategory, Value: g.Category},
+		{Field: "status", Kind: KindGoalStatus, Value: g.Status},
+	}
 }

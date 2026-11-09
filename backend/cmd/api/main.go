@@ -51,7 +51,7 @@ func run(logger *slog.Logger) error {
 
 	store := postgres.NewStore(pool)
 	sessions := auth.NewSessionManager(store.Sessions, cfg.SessionTTL)
-	base := httpapi.NewBaseHandler(logger)
+	base := httpapi.NewBaseHandler(logger, store.Lookups)
 	authH := httpapi.NewAuthHandler(base, store.Users, sessions, cfg.BcryptCost, cfg.Production())
 
 	server := httpapi.NewServer(logger, cfg.Production(), cfg.StaticDir, authH)

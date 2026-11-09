@@ -56,3 +56,10 @@ type SessionRepo interface {
 	DeleteByTokenHash(ctx context.Context, tokenHash string) error
 	DeleteExpired(ctx context.Context, now time.Time) error
 }
+
+// LookupRepo serves the fixed-choice option lists. The database owns these
+// values; handlers validate enumerated fields against them and the UI
+// populates dropdowns from them.
+type LookupRepo interface {
+	All(ctx context.Context) (domain.Lookups, error)
+}

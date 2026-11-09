@@ -26,6 +26,7 @@ type Store struct {
 	Certifications *CertificationRepo
 	Projects       *ProjectRepo
 	Goals          *GoalRepo
+	Lookups        *LookupRepo
 }
 
 // NewStore builds every repository on the shared pool.
@@ -41,6 +42,7 @@ func NewStore(pool *pgxpool.Pool) *Store {
 		Certifications: &CertificationRepo{pool: pool},
 		Projects:       &ProjectRepo{pool: pool},
 		Goals:          &GoalRepo{pool: pool},
+		Lookups:        &LookupRepo{pool: pool},
 	}
 }
 

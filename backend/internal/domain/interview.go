@@ -8,14 +8,6 @@ import (
 	"github.com/google/uuid"
 )
 
-// Interview stages model the steps of a hiring loop.
-var InterviewStages = []string{
-	"phone_screen", "technical", "system_design", "behavioral", "onsite", "final",
-}
-
-// InterviewOutcomes describe how an interview resolved.
-var InterviewOutcomes = []string{"pending", "passed", "failed", "cancelled"}
-
 // Interview is one interview event linked to an application.
 type Interview struct {
 	BaseRecord
@@ -37,7 +29,6 @@ func (i *Interview) Validate() validation.Errors {
 		e.Add("applicationId", "is required")
 	}
 	validation.Required(e, "stage", i.Stage)
-	validation.OneOf(e, "stage", i.Stage, InterviewStages...)
 	if i.ScheduledAt.IsZero() {
 		e.Add("scheduledAt", "is required")
 	}
@@ -45,8 +36,16 @@ func (i *Interview) Validate() validation.Errors {
 	validation.MaxLen(e, "interviewer", i.Interviewer, 200)
 	validation.MaxLen(e, "location", i.Location, 500)
 	validation.Required(e, "outcome", i.Outcome)
-	validation.OneOf(e, "outcome", i.Outcome, InterviewOutcomes...)
 	validation.MaxLen(e, "prepNotes", i.PrepNotes, 5000)
 	validation.MaxLen(e, "feedback", i.Feedback, 5000)
 	return e
+}
+
+// EnumFields implements Enumerated; the allowed values come from the lookup
+// table at request time.
+func (i *Interview) EnumFields() []EnumField {
+	return []EnumField{
+		{Field: "stage", Kind: KindInterviewStage, Value: i.Stage},
+		{Field: "outcome", Kind: KindInterviewOutcome, Value: i.Outcome},
+	}
 }

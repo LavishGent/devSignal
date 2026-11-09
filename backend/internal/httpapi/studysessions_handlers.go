@@ -84,7 +84,7 @@ func (h *StudySessionsHandler) create(w http.ResponseWriter, r *http.Request) {
 		h.badRequest(w, err)
 		return
 	}
-	if !h.validate(w, &s) {
+	if !h.validate(w, r, &s) {
 		return
 	}
 	if !h.checkSkillLink(w, r, userID, s.SkillID) {
@@ -129,7 +129,7 @@ func (h *StudySessionsHandler) update(w http.ResponseWriter, r *http.Request) {
 		h.badRequest(w, err)
 		return
 	}
-	if !h.validate(w, &in) {
+	if !h.validate(w, r, &in) {
 		return
 	}
 	if !h.checkSkillLink(w, r, userID, in.SkillID) {

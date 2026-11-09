@@ -58,7 +58,7 @@ func (h *SkillsHandler) create(w http.ResponseWriter, r *http.Request) {
 		h.badRequest(w, err)
 		return
 	}
-	if !h.validate(w, &s) {
+	if !h.validate(w, r, &s) {
 		return
 	}
 	s.StampNew(userID, h.Now())
@@ -100,7 +100,7 @@ func (h *SkillsHandler) update(w http.ResponseWriter, r *http.Request) {
 		h.badRequest(w, err)
 		return
 	}
-	if !h.validate(w, &in) {
+	if !h.validate(w, r, &in) {
 		return
 	}
 	existing, err := h.repo.Get(r.Context(), userID, id)

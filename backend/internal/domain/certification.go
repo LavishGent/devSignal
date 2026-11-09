@@ -2,9 +2,6 @@ package domain
 
 import "devsignal/internal/validation"
 
-// Certification statuses model a credential's lifecycle.
-var CertificationStatuses = []string{"planned", "in_progress", "earned", "expired"}
-
 // Certification is one tracked professional certification.
 type Certification struct {
 	BaseRecord
@@ -26,7 +23,6 @@ func (c *Certification) Validate() validation.Errors {
 	validation.Required(e, "issuer", c.Issuer)
 	validation.MaxLen(e, "issuer", c.Issuer, 200)
 	validation.Required(e, "status", c.Status)
-	validation.OneOf(e, "status", c.Status, CertificationStatuses...)
 	validation.DateOrder(e, "expiresOn", c.EarnedOn.Time(), c.ExpiresOn.Time(), "earnedOn")
 	validation.MaxLen(e, "credentialId", c.CredentialID, 200)
 	validation.WebURL(e, "credentialUrl", c.CredentialURL)
@@ -36,4 +32,12 @@ func (c *Certification) Validate() validation.Errors {
 		e.Add("earnedOn", "is required when status is earned")
 	}
 	return e
+}
+
+// EnumFields implements Enumerated; the allowed values come from the lookup
+// table at request time.
+func (c *Certification) EnumFields() []EnumField {
+	return []EnumField{
+		{Field: "status", Kind: KindCertificationStatus, Value: c.Status},
+	}
 }

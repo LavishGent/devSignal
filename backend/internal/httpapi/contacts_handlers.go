@@ -58,7 +58,7 @@ func (h *ContactsHandler) create(w http.ResponseWriter, r *http.Request) {
 		h.badRequest(w, err)
 		return
 	}
-	if !h.validate(w, &c) {
+	if !h.validate(w, r, &c) {
 		return
 	}
 	c.StampNew(userID, h.Now())
@@ -100,7 +100,7 @@ func (h *ContactsHandler) update(w http.ResponseWriter, r *http.Request) {
 		h.badRequest(w, err)
 		return
 	}
-	if !h.validate(w, &in) {
+	if !h.validate(w, r, &in) {
 		return
 	}
 	existing, err := h.repo.Get(r.Context(), userID, id)

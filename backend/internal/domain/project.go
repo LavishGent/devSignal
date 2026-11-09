@@ -2,9 +2,6 @@ package domain
 
 import "devsignal/internal/validation"
 
-// Project statuses model a portfolio project's lifecycle.
-var ProjectStatuses = []string{"idea", "active", "paused", "completed", "archived"}
-
 // Project is one tracked personal or portfolio project.
 type Project struct {
 	BaseRecord
@@ -26,7 +23,6 @@ func (p *Project) Validate() validation.Errors {
 	validation.MaxLen(e, "name", p.Name, 200)
 	validation.MaxLen(e, "description", p.Description, 5000)
 	validation.Required(e, "status", p.Status)
-	validation.OneOf(e, "status", p.Status, ProjectStatuses...)
 	validation.MaxLen(e, "techStack", p.TechStack, 500)
 	validation.WebURL(e, "repoUrl", p.RepoURL)
 	validation.MaxLen(e, "repoUrl", p.RepoURL, 2000)
@@ -35,4 +31,12 @@ func (p *Project) Validate() validation.Errors {
 	validation.DateOrder(e, "lastActivityOn", p.StartedOn.Time(), p.LastActivityOn.Time(), "startedOn")
 	validation.MaxLen(e, "notes", p.Notes, 5000)
 	return e
+}
+
+// EnumFields implements Enumerated; the allowed values come from the lookup
+// table at request time.
+func (p *Project) EnumFields() []EnumField {
+	return []EnumField{
+		{Field: "status", Kind: KindProjectStatus, Value: p.Status},
+	}
 }
