@@ -66,7 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   )
 }
 
-// useAuth exposes the auth state; using it outside AuthProvider is a bug.
+// useAuth exposes the auth state, using it outside AuthProvider is a bug.
 export function useAuth(): AuthState {
   const ctx = useContext(AuthContext)
   if (!ctx) throw new Error('useAuth must be used inside AuthProvider')
